@@ -1,4 +1,10 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { useState } from "react";
+import { TouchableOpacity } from "react-native";
 import styled from "styled-components/native";
+import { ProfileMenu } from "./UI/ProfileMenu";
+import { Spinner } from "./UI/Spinner";
 
 const PostView = styled.View`
 	padding: 15px;
@@ -93,13 +99,29 @@ const PostFooterImages = styled.Image.attrs({
 `;
 
 export const Post = ({
+	id,
 	title,
 	imageUrl,
 	countLikes,
 	countComments,
 	countShares,
 	createdAt,
+	isLike,
+	token,
 }) => {
+	const { data: dataPostAuthor, isLoading: postAuthorLoading } = useQuery({
+		queryKey: ["recipe-user-profile"],
+		queryFn: async () => {
+			return await axios.get(
+				`http://192.168.1.101:4000/users/profile/${id}`
+			);
+		},
+		select: data => data.data,
+	});
+	const [isLikeRecipe, setIsLikeRecipe] = useState(isLike);
+	const [isOpenProfileMenu, setIsOpenProfileMenu] = useState(false);
+	const queryClient = useQueryClient();
+
 	const formatDate = dateString => {
 		const date = new Date(dateString);
 
@@ -121,15 +143,48 @@ export const Post = ({
 
 	const imageUrlClean = cleanUrl(imageUrl);
 
+	const likeRecipe = useMutation({
+		mutationFn: async () => {
+			await axios.post(
+				`http://192.168.1.101:4000/recipes/like/${id}`,
+				{},
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				}
+			);
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries(["recipes"]);
+		},
+	});
+
+	if (postAuthorLoading) {
+		return <Spinner />;
+	}
+
 	return (
 		<PostView>
+			{isOpenProfileMenu && (
+				<ProfileMenu
+					name={dataPostAuthor.fullName}
+					email={dataPostAuthor.email}
+					isVisible={isOpenProfileMenu}
+				/>
+			)}
+
 			<PostHeader>
 				<UserInfo>
-					<PostUserAvatar>
-						<PostUserAvatarImage
-							source={require("../assets/avatar.png")}
-						/>
-					</PostUserAvatar>
+					<TouchableOpacity
+						onPress={() => setIsOpenProfileMenu(prev => !prev)}
+					>
+						<PostUserAvatar>
+							<PostUserAvatarImage
+								source={require("../assets/avatar.png")}
+							/>
+						</PostUserAvatar>
+					</TouchableOpacity>
 					<PostTitle>{title}</PostTitle>
 				</UserInfo>
 				<PostDateHeader>{formatDate(createdAt)}</PostDateHeader>
@@ -143,9 +198,29 @@ export const Post = ({
 
 			<PostFooter>
 				<FooterItem>
-					<PostFooterImages
-						source={require("../assets/activeLike.png")}
-					/>
+					{isLike ? (
+						<TouchableOpacity
+							onPress={() => {
+								likeRecipe.mutate();
+								setIsLikeRecipe(prev => !prev);
+							}}
+						>
+							<PostFooterImages
+								source={require("../assets/activeLike.png")}
+							/>
+						</TouchableOpacity>
+					) : (
+						<TouchableOpacity
+							onPress={() => {
+								likeRecipe.mutate();
+								setIsLikeRecipe(prev => !prev);
+							}}
+						>
+							<PostFooterImages
+								source={require("../assets/like.png")}
+							/>
+						</TouchableOpacity>
+					)}
 					<FooterText>{countLikes}</FooterText>
 				</FooterItem>
 				<FooterItem>

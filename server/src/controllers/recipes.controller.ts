@@ -1,12 +1,10 @@
 import { Request, Response, Router } from "express";
 import {
 	createRecipe,
-	// deleteRecipe,
-	// filterRecipe,
-	// updateRecipe,
 	getRecipe,
 	getRecipes,
 	getUserRecipes,
+	likeRecipe,
 } from "../services/recipes.service";
 import AuthCheck from "../utils/AuthCheck";
 import { logger } from "../utils/log";
@@ -66,44 +64,16 @@ router.get("/my-recipes", AuthCheck, async (req: Request, res: Response) => {
 	}
 });
 
-// router.delete("/:id", async (req: Request, res: Response) => {
-// 	try {
-// 		await deleteRecipe(String(req.params.id));
-// 	} catch (error) {
-// 		logger.error(error);
-// 		res.status(500).json({ message: "Error delete recipe" });
-// 	}
-// });
-
-// router.patch("/", AuthCheck, async (req: Request, res: Response) => {
-// 	try {
-// 		const { id, title, description, tags } = req.body;
-// 		const updatedRecipe = await updateRecipe(id, title, description, tags);
-// 		res.status(200).json(updatedRecipe);
-// 	} catch (error) {
-// 		logger.error(error);
-// 		res.status(500).json({ message: "Error update recipe" });
-// 	}
-// });
-
-// router.get("/", async (req: Request, res: Response) => {
-// 	try {
-// 		const title =
-// 			typeof req.query.title === "string" ? req.query.title : undefined;
-// 		let tags: string[] | undefined;
-
-// 		if (typeof req.query.tags === "string") {
-// 			tags = [req.query.tags];
-// 		} else if (Array.isArray(req.query.tags)) {
-// 			tags = req.query.tags as string[];
-// 		}
-
-// 		const recipes = await filterRecipe(title, tags);
-// 		res.status(200).json(recipes);
-// 	} catch (error) {
-// 		logger.error(error);
-// 		res.status(500).json({ message: "Error update recipe" });
-// 	}
-// });
+router.post("/like/:id", AuthCheck, async (req: Request, res: Response) => {
+	try {
+		const userId = req.userId;
+		const postId = String(req.params.id);
+		await likeRecipe(userId!, postId);
+		res.status(200).json({ success: true });
+	} catch (error) {
+		logger.error(error);
+		res.status(500).json({ message: "Error like recipe" });
+	}
+});
 
 export const RecipesRouter = router;

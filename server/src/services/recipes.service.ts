@@ -2,6 +2,8 @@ import { ObjectId } from "mongodb";
 // import { MongoRepository } from "typeorm";
 import { myDataSource } from "../db/app-data-source";
 import { Recipes } from "../entity/recipes.entity";
+import { User } from "../entity/user.entity";
+import { TRecipeWithAuthor } from "../types/recipes.interface";
 
 export const createRecipe = async (
 	dto: Recipes,
@@ -17,19 +19,29 @@ export const createRecipe = async (
 		categories: dto.categories,
 		cookingTime: dto.cookingTime,
 		createdAt: new Date(),
-		countLikes: dto.countLikes,
-		countComments: dto.countComments,
-		countShares: dto.countShares,
+		countLikes: +dto.countLikes,
+		countComments: +dto.countComments,
+		countShares: +dto.countShares,
 	});
 };
 
 export const getRecipe = async (
-	id: string | ObjectId
-): Promise<Recipes | null> => {
-	const objectId = new ObjectId(id);
-	return await myDataSource
-		.getRepository(Recipes)
-		.findOneBy({ id: objectId });
+	postId: string | ObjectId
+): Promise<TRecipeWithAuthor | null> => {
+	const objectRecipeId = new ObjectId(postId);
+
+	const recipeRepo = myDataSource.getMongoRepository(Recipes);
+	const userRepo = myDataSource.getMongoRepository(User);
+	const recipe = await recipeRepo.findOne({ where: { _id: objectRecipeId } });
+
+	const objectUserId = new ObjectId(recipe?.userId);
+
+	const user = await userRepo.findOne({ where: { _id: objectUserId } });
+
+	return {
+		...(recipe as Recipes),
+		...(user as User),
+	};
 };
 
 export const getUserRecipes = async (
@@ -45,44 +57,32 @@ export const getRecipes = async (): Promise<Recipes[] | null> => {
 	return await myDataSource.getMongoRepository(Recipes).find();
 };
 
-// export const updateRecipe = async (
-// 	id: ObjectId,
-// 	title?: string,
-// 	description?: string,
-// 	tags?: string[]
-// ): Promise<Recipes> => {
-// 	const objectId = new ObjectId(id);
-// 	const recipe = await getRecipe(objectId);
-// 	if (!recipe) {
-// 		throw new Error("Recipe not found");
-// 	}
-// 	const updateRecipe = {
-// 		...(title && { title }),
-// 		...(description && { description }),
-// 		...(tags && { tags }),
-// 	};
-// 	await myDataSource
-// 		.getRepository(Recipes)
-// 		.update({ id: objectId }, updateRecipe);
-// 	return (await getRecipe(objectId))!;
-// };
+export const likeRecipe = async (
+	userId: ObjectId,
+	postId: ObjectId | string
+): Promise<void> => {
+	const objectUserId = new ObjectId(userId);
+	const objectRecipeId = new ObjectId(postId);
 
-// export const deleteRecipe = async (id: ObjectId | string): Promise<void> => {
-// 	const objectId = new ObjectId(id);
-// 	await myDataSource.getRepository(Recipes).delete(objectId);
-// };
+	const recipeRepo = myDataSource.getMongoRepository(Recipes);
+	const userRepo = myDataSource.getMongoRepository(User);
 
-// export const filterRecipe = async (
-// 	title?: string,
-// 	tags?: string[]
-// ): Promise<Recipes[] | null> => {
-// 	const recipeRepo: MongoRepository<Recipes> =
-// 		myDataSource.getMongoRepository(Recipes);
+	const recipe = await recipeRepo.findOne({ where: { _id: objectRecipeId } });
+	const user = await userRepo.findOne({ where: { _id: objectUserId } });
 
-// 	let filter: any = {};
+	if (!recipe || !user) throw new Error("Recipe or user not found");
 
-// 	if (title) filter.title = { $regex: title, $options: "i" };
-// 	if (tags && tags.length > 0) filter.tags = { $in: tags };
+	const recipeIdStr = recipe.id.toString();
+	const hasLiked = user.likedPosts.includes(recipeIdStr);
 
-// 	return await recipeRepo.find({ where: filter });
-// };
+	if (hasLiked) {
+		recipe.countLikes = Math.max(0, recipe.countLikes - 1);
+		user.likedPosts = user.likedPosts.filter(id => id !== recipeIdStr);
+	} else {
+		recipe.countLikes += 1;
+		user.likedPosts.push(recipeIdStr);
+	}
+
+	await recipeRepo.save(recipe);
+	await userRepo.save(user);
+};

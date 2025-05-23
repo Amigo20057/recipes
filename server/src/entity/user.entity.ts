@@ -12,8 +12,14 @@ export class User {
 	password!: string;
 
 	@Column()
-	firstName!: string;
+	fullName!: string;
 
-	@Column()
-	lastName!: string;
+	@Column({ default: [] })
+	likedPosts!: string[];
+
+	@Column({ default: [] })
+	followers!: string[];
+
+	@Column({ default: [] })
+	follows!: string[];
 }

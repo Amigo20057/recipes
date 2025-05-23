@@ -4,6 +4,5 @@ export interface IUser {
 	id?: ObjectId;
 	email?: string;
 	password?: string;
-	firstName?: string;
-	lastName?: string;
+	fullName?: string;
 }

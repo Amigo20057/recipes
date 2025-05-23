@@ -2,13 +2,12 @@ import { hash, verify } from "argon2";
 import "dotenv/config";
 import jwt from "jsonwebtoken";
 import { User } from "../entity/user.entity";
-import { IUser } from "../types/user.interface";
 import { createUser, findUserByEmail } from "./user.service";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
 export const register = async (
-	dto: IUser
+	dto: User
 ): Promise<User & { token: string }> => {
 	const existsUser = await findUserByEmail(dto.email!);
 	if (existsUser) {

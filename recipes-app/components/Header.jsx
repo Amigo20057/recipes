@@ -15,7 +15,7 @@ const HeaderTop = styled.View`
 	justify-content: space-between;
 `;
 
-const HeaderAvatar = styled.View`
+const HeaderAvatar = styled.TouchableOpacity`
 	width: 60px;
 	height: 60px;
 	background-color: #fff;
@@ -24,7 +24,6 @@ const HeaderAvatar = styled.View`
 	align-items: center;
 	justify-content: center;
 `;
-
 const HeaderAvatarImage = styled.Image.attrs({
 	resizeMode: "contain",
 })`
@@ -87,11 +86,13 @@ const HeaderCreatePostImage = styled.Image.attrs({
 	margin: 0 10px;
 `;
 
-export const Header = () => {
+export const Header = ({ setIsOpenProfileMenu }) => {
 	return (
 		<HeaderView>
 			<HeaderTop>
-				<HeaderAvatar>
+				<HeaderAvatar
+					onPress={() => setIsOpenProfileMenu(prev => !prev)}
+				>
 					<HeaderAvatarImage
 						source={require("../assets/secondAvatar.png")}
 					/>

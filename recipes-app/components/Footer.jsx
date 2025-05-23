@@ -1,4 +1,7 @@
+import { useState } from "react";
+import { TouchableOpacity } from "react-native";
 import styled from "styled-components/native";
+import { FooterMenu } from "./UI/FooterMenu";
 
 const FooterContainer = styled.View`
 	position: absolute;
@@ -40,27 +43,39 @@ const FooterLabel = styled.Text`
 `;
 
 export const Footer = () => {
+	const [isOpenMenu, setIsOpenMenu] = useState(false);
+
 	return (
-		<FooterContainer>
-			<FooterBtnWrapper>
-				<FooterBtns source={require("../assets/homeActiveIcon.png")} />
-				<FooterLabel>Головна</FooterLabel>
-			</FooterBtnWrapper>
-			<FooterBtnWrapper>
-				<FooterBtns source={require("../assets/book.png")} />
-				<FooterLabel>Книга</FooterLabel>
-			</FooterBtnWrapper>
-			<FooterBtnWrapper>
-				<FooterBtnLarge source={require("../assets/mainBtn.png")} />
-			</FooterBtnWrapper>
-			<FooterBtnWrapper>
-				<FooterBtns source={require("../assets/avatar.png")} />
-				<FooterLabel>Профіль</FooterLabel>
-			</FooterBtnWrapper>
-			<FooterBtnWrapper>
-				<FooterBtns source={require("../assets/category.png")} />
-				<FooterLabel>Категорії</FooterLabel>
-			</FooterBtnWrapper>
-		</FooterContainer>
+		<>
+			<FooterContainer>
+				{isOpenMenu && <FooterMenu />}
+				<FooterBtnWrapper>
+					<FooterBtns
+						source={require("../assets/homeActiveIcon.png")}
+					/>
+					<FooterLabel>Головна</FooterLabel>
+				</FooterBtnWrapper>
+				<FooterBtnWrapper>
+					<FooterBtns source={require("../assets/book.png")} />
+					<FooterLabel>Книга</FooterLabel>
+				</FooterBtnWrapper>
+				<TouchableOpacity onPress={() => setIsOpenMenu(prev => !prev)}>
+					<FooterBtnWrapper>
+						<FooterBtnLarge
+							source={require("../assets/mainBtn.png")}
+						/>
+					</FooterBtnWrapper>
+				</TouchableOpacity>
+
+				<FooterBtnWrapper>
+					<FooterBtns source={require("../assets/avatar.png")} />
+					<FooterLabel>Підписки</FooterLabel>
+				</FooterBtnWrapper>
+				<FooterBtnWrapper>
+					<FooterBtns source={require("../assets/category.png")} />
+					<FooterLabel>Категорії</FooterLabel>
+				</FooterBtnWrapper>
+			</FooterContainer>
+		</>
 	);
 };

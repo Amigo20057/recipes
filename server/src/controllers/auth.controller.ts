@@ -10,7 +10,7 @@ router.post("/register", async (req: Request, res: Response) => {
 		res.status(200).json(user);
 	} catch (error) {
 		logger.error("Error register user: ", error);
-		res.status(500).json({ message: "Error register user" });
+		res.status(500).json({ message: "Error register user", error: error });
 	}
 });
 
@@ -21,7 +21,7 @@ router.post("/login", async (req: Request, res: Response) => {
 		res.status(200).json(user);
 	} catch (error) {
 		logger.error("Error login user: ", error);
-		res.status(500).json({ message: "Error login user" });
+		res.status(500).json({ message: "Error login user", error: error });
 	}
 });
 
