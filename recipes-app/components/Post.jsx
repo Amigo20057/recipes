@@ -1,3 +1,4 @@
+import { useNavigation } from "@react-navigation/native";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
@@ -104,7 +105,6 @@ export const Post = ({
 	imageUrl,
 	countLikes,
 	countComments,
-	countShares,
 	createdAt,
 	isLike,
 	token,
@@ -121,15 +121,16 @@ export const Post = ({
 	const [isLikeRecipe, setIsLikeRecipe] = useState(isLike);
 	const [isOpenProfileMenu, setIsOpenProfileMenu] = useState(false);
 	const queryClient = useQueryClient();
+	const navigation = useNavigation();
 
 	const formatDate = dateString => {
 		const date = new Date(dateString);
 
-		const day = date.toLocaleDateString("ru-RU", {
+		const day = date.toLocaleDateString("uk-UA", {
 			day: "numeric",
 			month: "long",
 		});
-		const time = date.toLocaleTimeString("ru-RU", {
+		const time = date.toLocaleTimeString("uk-UA", {
 			hour: "2-digit",
 			minute: "2-digit",
 		});
@@ -190,11 +191,15 @@ export const Post = ({
 				<PostDateHeader>{formatDate(createdAt)}</PostDateHeader>
 			</PostHeader>
 
-			{imageUrlClean ? (
-				<PostImage source={{ uri: imageUrlClean }} />
-			) : (
-				<PostImage source={require("../assets/avatar.png")} />
-			)}
+			<TouchableOpacity
+				onPress={() => navigation.navigate("FullPost", { id })}
+			>
+				{imageUrlClean ? (
+					<PostImage source={{ uri: imageUrlClean }} />
+				) : (
+					<PostImage source={require("../assets/avatar.png")} />
+				)}
+			</TouchableOpacity>
 
 			<PostFooter>
 				<FooterItem>
@@ -224,16 +229,20 @@ export const Post = ({
 					<FooterText>{countLikes}</FooterText>
 				</FooterItem>
 				<FooterItem>
-					<PostFooterImages
-						source={require("../assets/comments.png")}
-					/>
+					<TouchableOpacity
+						onPress={() =>
+							navigation.navigate("PostComment", {
+								id,
+								title,
+								token,
+							})
+						}
+					>
+						<PostFooterImages
+							source={require("../assets/comments.png")}
+						/>
+					</TouchableOpacity>
 					<FooterText>{countComments}</FooterText>
-				</FooterItem>
-				<FooterItem>
-					<PostFooterImages
-						source={require("../assets/activePen.png")}
-					/>
-					<FooterText>{countShares}</FooterText>
 				</FooterItem>
 			</PostFooter>
 		</PostView>

@@ -19,9 +19,9 @@ export const createRecipe = async (
 		categories: dto.categories,
 		cookingTime: dto.cookingTime,
 		createdAt: new Date(),
-		countLikes: +dto.countLikes,
-		countComments: +dto.countComments,
-		countShares: +dto.countShares,
+		countLikes: 0,
+		countComments: 0,
+		countShares: 0,
 	});
 };
 
@@ -54,7 +54,11 @@ export const getUserRecipes = async (
 };
 
 export const getRecipes = async (): Promise<Recipes[] | null> => {
-	return await myDataSource.getMongoRepository(Recipes).find();
+	return await myDataSource.getMongoRepository(Recipes).find({
+		order: {
+			createdAt: "DESC",
+		},
+	});
 };
 
 export const likeRecipe = async (

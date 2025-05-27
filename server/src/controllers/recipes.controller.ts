@@ -24,8 +24,8 @@ router.post(
 			}
 			const userId = req.userId;
 			const pictureUrl = `../uploads/recipes-uploads/${req.file.filename}`;
-			const picture = await createRecipe(req.body, userId!, pictureUrl);
-			res.status(200).json(picture);
+			const recipe = await createRecipe(req.body, userId!, pictureUrl);
+			res.status(200).json(recipe);
 		} catch (error) {
 			logger.error(error);
 			res.status(500).json({ message: "Error create recipe" });

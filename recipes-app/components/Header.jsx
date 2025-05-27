@@ -1,3 +1,4 @@
+import { useNavigation } from "@react-navigation/native";
 import styled from "styled-components/native";
 
 const HeaderView = styled.View`
@@ -86,7 +87,8 @@ const HeaderCreatePostImage = styled.Image.attrs({
 	margin: 0 10px;
 `;
 
-export const Header = ({ setIsOpenProfileMenu }) => {
+export const Header = ({ setIsOpenProfileMenu, token }) => {
+	const navigation = useNavigation();
 	return (
 		<HeaderView>
 			<HeaderTop>
@@ -103,7 +105,9 @@ export const Header = ({ setIsOpenProfileMenu }) => {
 				</SearchContainer>
 			</HeaderTop>
 			<HeaderBottom>
-				<HeaderCreatePost onPress={() => console.log("Create Post")}>
+				<HeaderCreatePost
+					onPress={() => navigation.navigate("CreatePost", { token })}
+				>
 					<HeaderCreatePostImage
 						source={require("../assets/create.png")}
 					/>

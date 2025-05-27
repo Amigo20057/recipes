@@ -1,7 +1,10 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { CreatePostScreen } from "./CreatePostScreen";
+import { FullPostScreen } from "./FullPostScreen";
 import { HomeScreen } from "./HomeScreen";
 import { LoginScreen } from "./LoginScreen";
+import { PostCommentScreen } from "./PostCommentScreen";
 import { RegisterScreen } from "./RegisterScreen";
 
 const Stack = createNativeStackNavigator();
@@ -23,6 +26,31 @@ export const Navigation = () => {
 				<Stack.Screen
 					name='Login'
 					component={LoginScreen}
+					options={{ headerShown: false }}
+				/>
+				<Stack.Screen
+					name='FullPost'
+					component={FullPostScreen}
+					options={{ headerShown: false }}
+				/>
+				<Stack.Screen
+					name='PostComment'
+					component={PostCommentScreen}
+					options={({ route }) => ({
+						title: route.params?.title || "Коментарі",
+						headerBackTitle: "-",
+						headerStyle: {
+							backgroundColor: "#232222",
+						},
+						headerTintColor: "#fff",
+						headerTitleStyle: {
+							fontWeight: "bold",
+						},
+					})}
+				/>
+				<Stack.Screen
+					name='CreatePost'
+					component={CreatePostScreen}
 					options={{ headerShown: false }}
 				/>
 			</Stack.Navigator>

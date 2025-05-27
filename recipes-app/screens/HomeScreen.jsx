@@ -66,7 +66,10 @@ export const HomeScreen = () => {
 					/>
 				}
 			>
-				<Header setIsOpenProfileMenu={setIsOpenProfileMenu} />
+				<Header
+					setIsOpenProfileMenu={setIsOpenProfileMenu}
+					token={token}
+				/>
 				{isOpenProfileMenu && (
 					<ProfileMenu
 						name={profileData?.fullName}
@@ -82,7 +85,6 @@ export const HomeScreen = () => {
 						title={item.title}
 						countLikes={item.countLikes}
 						countComments={item.countComments}
-						countShares={item.countShares}
 						createdAt={item.createdAt}
 						imageUrl={`http://192.168.1.101:4000/${item.picture}`}
 						isLike={

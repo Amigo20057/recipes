@@ -3,6 +3,7 @@ import "dotenv/config";
 import express, { NextFunction, Request, Response } from "express";
 import path from "node:path";
 import { AuthRouter } from "./controllers/auth.controller";
+import { CommentsRouter } from "./controllers/comments.controller";
 import { RecipesRouter } from "./controllers/recipes.controller";
 import { UserRouter } from "./controllers/user.controller";
 import { myDataSource } from "./db/app-data-source";
@@ -32,6 +33,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 app.use("/auth", AuthRouter);
 app.use("/users", UserRouter);
 app.use("/recipes", RecipesRouter);
+app.use("/comments", CommentsRouter);
 
 app.all("*", (req: Request, res: Response) => {
 	res.status(404).json({ message: "Not found" });
