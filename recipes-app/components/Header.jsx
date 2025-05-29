@@ -87,7 +87,7 @@ const HeaderCreatePostImage = styled.Image.attrs({
 	margin: 0 10px;
 `;
 
-export const Header = ({ setIsOpenProfileMenu, token }) => {
+export const Header = ({ setIsOpenProfileMenu, token, search, setSearch }) => {
 	const navigation = useNavigation();
 	return (
 		<HeaderView>
@@ -100,7 +100,11 @@ export const Header = ({ setIsOpenProfileMenu, token }) => {
 					/>
 				</HeaderAvatar>
 				<SearchContainer>
-					<HeaderSearch placeholder='Пошук рецептів' />
+					<HeaderSearch
+						placeholder='Пошук рецептів'
+						value={search}
+						onChangeText={text => setSearch(text)}
+					/>
 					<HeaderSearchImg source={require("../assets/search.png")} />
 				</SearchContainer>
 			</HeaderTop>

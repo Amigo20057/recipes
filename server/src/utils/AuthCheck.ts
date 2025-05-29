@@ -2,7 +2,7 @@ import "dotenv/config";
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { ObjectId } from "mongodb";
-import {logger} from "./log";
+import { logger } from "./log";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 

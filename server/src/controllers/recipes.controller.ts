@@ -86,6 +86,7 @@ router.get(
 	async (req: Request, res: Response) => {
 		try {
 			const recipes = await getFollowRecipes(req.userId!);
+			logger.info(recipes);
 			res.status(200).json(recipes);
 		} catch (error) {
 			res.status(500).json({

@@ -58,21 +58,20 @@ export const getFollowRecipes = async (
 ): Promise<Recipes[] | null> => {
 	const objectId = new ObjectId(userId);
 
-	const userRepo = await myDataSource.getMongoRepository(User);
-	const recipeRepo = await myDataSource.getMongoRepository(Recipes);
+	const userRepo = myDataSource.getMongoRepository(User);
+	const recipeRepo = myDataSource.getMongoRepository(Recipes);
 
 	const user = await userRepo.findOne({ where: { _id: objectId } });
-	if (!user) {
-		throw new Error("User not found");
-	}
 
-	if (!user.follows || user.follows.length === 0) {
+	if (!user || !user.follows?.length) {
 		return [];
 	}
 
+	const followsObjectIds = user.follows.map(id => new ObjectId(id));
+
 	const recipes = await recipeRepo.find({
 		where: {
-			userId: { $in: user.follows },
+			userId: { $in: followsObjectIds },
 		},
 		order: {
 			createdAt: "DESC",

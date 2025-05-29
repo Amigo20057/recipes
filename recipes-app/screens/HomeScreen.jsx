@@ -40,6 +40,7 @@ export const HomeScreen = () => {
 	});
 	const [refreshing, setRefreshing] = useState(false);
 	const navigation = useNavigation();
+	const [search, setSearch] = useState("");
 
 	const onRefresh = useCallback(async () => {
 		setRefreshing(true);
@@ -59,11 +60,13 @@ export const HomeScreen = () => {
 		checkToken();
 	}, []);
 
+	const filteredRecipes = recipeData?.filter(recipe =>
+		recipe.title.toLowerCase().includes(search.toLowerCase())
+	);
+
 	if (profileDataLoading || recipeDataLoading || !profileData) {
 		return <Spinner />;
 	}
-
-	console.log(apiUrl);
 
 	return (
 		<View>
@@ -81,6 +84,8 @@ export const HomeScreen = () => {
 				<Header
 					setIsOpenProfileMenu={setIsOpenProfileMenu}
 					token={token}
+					search={search}
+					setSearch={setSearch}
 				/>
 				{isOpenProfileMenu && (
 					<ProfileMenu
@@ -93,7 +98,7 @@ export const HomeScreen = () => {
 						isMyProfile={true}
 					/>
 				)}
-				{recipeData?.map(item => (
+				{filteredRecipes?.map(item => (
 					<Post
 						token={token}
 						key={item.id}

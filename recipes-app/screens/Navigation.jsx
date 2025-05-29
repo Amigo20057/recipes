@@ -95,17 +95,9 @@ export const Navigation = () => {
 				<Stack.Screen
 					name='FollowsPosts'
 					component={FollowsPostsScreen}
-					options={({ route }) => ({
-						title: route.params?.title || "Пости з підписок",
-						headerBackTitle: "-",
-						headerStyle: {
-							backgroundColor: "#232222",
-						},
-						headerTintColor: "#fff",
-						headerTitleStyle: {
-							fontWeight: "bold",
-						},
-					})}
+					options={{
+						headerShown: false,
+					}}
 				/>
 			</Stack.Navigator>
 		</NavigationContainer>

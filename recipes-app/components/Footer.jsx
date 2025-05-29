@@ -89,10 +89,20 @@ export const Footer = () => {
 					</FooterBtnWrapper>
 				</TouchableOpacity>
 
-				<FooterBtnWrapper>
-					<FooterBtns source={require("../assets/avatar.png")} />
-					<FooterLabel>Підписки</FooterLabel>
-				</FooterBtnWrapper>
+				<TouchableOpacity
+					onPress={() => navigation.navigate("FollowsPosts")}
+				>
+					<FooterBtnWrapper>
+						<FooterBtns
+							source={
+								currentRoute === "FollowsPosts"
+									? require("../assets/secondAvatar.png")
+									: require("../assets/avatar.png")
+							}
+						/>
+						<FooterLabel>Підписки</FooterLabel>
+					</FooterBtnWrapper>
+				</TouchableOpacity>
 
 				<TouchableOpacity
 					onPress={() => navigation.navigate("Categories")}
