@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { useQuery } from "@tanstack/react-query";
+import Constants from "expo-constants";
 import { useCallback, useEffect, useState } from "react";
 import { Dimensions, RefreshControl, ScrollView, View } from "react-native";
 import styled from "styled-components/native";
@@ -20,6 +21,7 @@ const Container = styled(ScrollView)`
 `;
 
 export const HomeScreen = () => {
+	const apiUrl = Constants.expoConfig.extra.apiUrl;
 	const [token, setToken] = useState(null);
 	const [isOpenProfileMenu, setIsOpenProfileMenu] = useState(false);
 	const {
@@ -32,9 +34,7 @@ export const HomeScreen = () => {
 	const { data: dataPostAuthor, isLoading: postAuthorLoading } = useQuery({
 		queryKey: ["recipe-user-profile"],
 		queryFn: async () => {
-			return await axios.get(
-				`http://192.168.1.101:4000/users/profile/${id}`
-			);
+			return await axios.get(`${apiUrl}/users/profile/${id}`);
 		},
 		select: data => data.data,
 	});
@@ -62,6 +62,8 @@ export const HomeScreen = () => {
 	if (profileDataLoading || recipeDataLoading || !profileData) {
 		return <Spinner />;
 	}
+
+	console.log(apiUrl);
 
 	return (
 		<View>
@@ -100,7 +102,7 @@ export const HomeScreen = () => {
 						countLikes={item.countLikes}
 						countComments={item.countComments}
 						createdAt={item.createdAt}
-						imageUrl={`http://192.168.1.101:4000/${item.picture}`}
+						imageUrl={`${apiUrl}/${item.picture}`}
 						isLike={profileData?.likedPosts.includes(item.id)}
 						follows={profileData?.follows}
 						profileId={profileData?.id}

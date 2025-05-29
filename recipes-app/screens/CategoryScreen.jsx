@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRoute } from "@react-navigation/native";
 import { useQuery } from "@tanstack/react-query";
+import Constants from "expo-constants";
 import { useEffect, useState } from "react";
 import { Dimensions, ScrollView, View } from "react-native";
 import styled from "styled-components/native";
@@ -17,6 +18,7 @@ const Container = styled(ScrollView)`
 `;
 
 export const CategoryScreen = () => {
+	const apiUrl = Constants.expoConfig.extra.apiUrl;
 	const [token, setToken] = useState(null);
 	const route = useRoute();
 	const { category } = route.params;
@@ -30,9 +32,7 @@ export const CategoryScreen = () => {
 	const { data: dataPostAuthor, isLoading: postAuthorLoading } = useQuery({
 		queryKey: ["recipe-user-profile"],
 		queryFn: async () => {
-			return await axios.get(
-				`http://192.168.1.101:4000/users/profile/${id}`
-			);
+			return await axios.get(`${apiUrl}/users/profile/${id}`);
 		},
 		select: data => data.data,
 	});
@@ -64,7 +64,7 @@ export const CategoryScreen = () => {
 						countLikes={item.countLikes}
 						countComments={item.countComments}
 						createdAt={item.createdAt}
-						imageUrl={`http://192.168.1.101:4000/${item.picture}`}
+						imageUrl={`${apiUrl}/${item.picture}`}
 						isLike={profileData?.likedPosts.includes(item.id)}
 						follows={profileData?.follows}
 						profileId={profileData?.id}

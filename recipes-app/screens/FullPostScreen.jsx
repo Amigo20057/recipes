@@ -1,4 +1,5 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
+import Constants from "expo-constants";
 import { Dimensions, ScrollView, TouchableOpacity } from "react-native";
 import styled from "styled-components/native";
 import { Spinner } from "../components/UI/Spinner";
@@ -78,6 +79,7 @@ const Btn = styled.View`
 `;
 
 export const FullPostScreen = () => {
+	const apiUrl = Constants.expoConfig.extra.apiUrl;
 	const route = useRoute();
 	const { id } = route.params;
 	const { data, isLoading } = useRecipe(id);
@@ -91,7 +93,7 @@ export const FullPostScreen = () => {
 		return url ? url.replace(/\/\.\.\//g, "/") : null;
 	};
 
-	const imageUrl = `http://192.168.1.101:4000/${data.picture}`;
+	const imageUrl = `${apiUrl}/${data.picture}`;
 	const imageUrlClean = cleanUrl(imageUrl);
 
 	const renderTags = () => {

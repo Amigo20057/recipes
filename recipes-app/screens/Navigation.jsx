@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { CategoriesScreen } from "./CategoriesScreen";
 import { CategoryScreen } from "./CategoryScreen";
 import { CreatePostScreen } from "./CreatePostScreen";
+import { FollowsPostsScreen } from "./FollowsPostsScreen";
 import { FullPostScreen } from "./FullPostScreen";
 import { HomeScreen } from "./HomeScreen";
 import { LoginScreen } from "./LoginScreen";
@@ -81,6 +82,21 @@ export const Navigation = () => {
 					component={CategoryScreen}
 					options={({ route }) => ({
 						title: route.params?.category,
+						headerBackTitle: "-",
+						headerStyle: {
+							backgroundColor: "#232222",
+						},
+						headerTintColor: "#fff",
+						headerTitleStyle: {
+							fontWeight: "bold",
+						},
+					})}
+				/>
+				<Stack.Screen
+					name='FollowsPosts'
+					component={FollowsPostsScreen}
+					options={({ route }) => ({
+						title: route.params?.title || "Пости з підписок",
 						headerBackTitle: "-",
 						headerStyle: {
 							backgroundColor: "#232222",

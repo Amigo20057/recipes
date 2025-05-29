@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
+import Constants from "expo-constants";
 import { useEffect, useRef } from "react";
 import { Animated, TouchableOpacity, View } from "react-native";
 import styled from "styled-components/native";
@@ -86,6 +87,7 @@ export const ProfileMenu = ({
 	token,
 	isMyProfile = false,
 }) => {
+	const apiUrl = Constants.expoConfig.extra.apiUrl;
 	const animatedHeight = useRef(new Animated.Value(0)).current;
 	const queryClient = useQueryClient();
 
@@ -100,7 +102,7 @@ export const ProfileMenu = ({
 	const subscribeMutation = useMutation({
 		mutationFn: async () => {
 			return await axios.post(
-				`http://192.168.1.101:4000/users/subscribe/${authorPostId}`,
+				`${apiUrl}/users/subscribe/${authorPostId}`,
 				{},
 				{
 					headers: {

@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
+import Constants from "expo-constants";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
@@ -113,6 +114,7 @@ const InputImage = styled.Image.attrs({
 `;
 
 export const LoginScreen = () => {
+	const apiUrl = Constants.expoConfig.extra.apiUrl;
 	const [errorMessage, setErrorMessage] = useState();
 	const navigation = useNavigation();
 	const {
@@ -128,10 +130,7 @@ export const LoginScreen = () => {
 
 	const loginMutation = useMutation({
 		mutationFn: async values => {
-			const response = await axios.post(
-				"http://192.168.1.101:4000/auth/login",
-				values
-			);
+			const response = await axios.post(`${apiUrl}/auth/login`, values);
 			const token = response.data.token;
 			if (!token) {
 				throw new Error("Token not received");

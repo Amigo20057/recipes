@@ -1,6 +1,7 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
+import Constants from "expo-constants";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -129,6 +130,7 @@ const ErrorText = styled.Text`
 `;
 
 export const CreatePostScreen = () => {
+	const apiUrl = Constants.expoConfig.extra.apiUrl;
 	const navigation = useNavigation();
 	const [imageUri, setImageUri] = useState(null);
 	const [open, setOpen] = useState(false);
@@ -199,16 +201,12 @@ export const CreatePostScreen = () => {
 
 	const createPostMutation = useMutation({
 		mutationFn: async formData => {
-			return await axios.post(
-				"http://192.168.1.101:4000/recipes/create",
-				formData,
-				{
-					headers: {
-						Authorization: `Bearer ${token}`,
-						"Content-Type": "multipart/form-data",
-					},
-				}
-			);
+			return await axios.post(`${apiUrl}/recipes/create`, formData, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+					"Content-Type": "multipart/form-data",
+				},
+			});
 		},
 		onSuccess: () => {
 			console.log("Пост успішно створено");

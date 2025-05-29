@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
+import Constants from "expo-constants";
 import { useCallback, useEffect, useState } from "react";
 import { Dimensions, RefreshControl, ScrollView, View } from "react-native";
 import styled from "styled-components/native";
@@ -24,6 +25,7 @@ const CustomText = styled.Text`
 `;
 
 export const MyRecipesScreen = () => {
+	const apiUrl = Constants.expoConfig.extra.apiUrl;
 	const [isOpenProfileMenu, setIsOpenProfileMenu] = useState(false);
 	const [token, setToken] = useState(null);
 	const {
@@ -100,7 +102,7 @@ export const MyRecipesScreen = () => {
 							countLikes={item.countLikes}
 							countComments={item.countComments}
 							createdAt={item.createdAt}
-							imageUrl={`http://192.168.1.101:4000/${item.picture}`}
+							imageUrl={`${apiUrl}/${item.picture}`}
 							isLike={
 								profileData?.likedPosts.includes(item.id)
 									? true

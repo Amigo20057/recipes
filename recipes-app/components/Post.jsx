@@ -1,6 +1,7 @@
 import { useNavigation } from "@react-navigation/native";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
+import Constants from "expo-constants";
 import { useState } from "react";
 import { TouchableOpacity } from "react-native";
 import styled from "styled-components/native";
@@ -111,6 +112,7 @@ export const Post = ({
 	follows,
 	profileId,
 }) => {
+	const apiUrl = Constants.expoConfig.extra.apiUrl;
 	const {
 		data: authorData,
 		isLoading: authorLoading,
@@ -118,9 +120,7 @@ export const Post = ({
 	} = useQuery({
 		queryKey: ["recipe-user-profile", id],
 		queryFn: async () => {
-			const res = await axios.get(
-				`http://192.168.1.101:4000/users/profile/${id}`
-			);
+			const res = await axios.get(`${apiUrl}/users/profile/${id}`);
 			return res.data;
 		},
 		enabled: !!id,
@@ -156,7 +156,7 @@ export const Post = ({
 	const likeRecipe = useMutation({
 		mutationFn: async () => {
 			await axios.post(
-				`http://192.168.1.101:4000/recipes/like/${id}`,
+				`${apiUrl}/recipes/like/${id}`,
 				{},
 				{
 					headers: {

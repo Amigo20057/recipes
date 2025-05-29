@@ -1,6 +1,7 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
+import Constants from "expo-constants";
 import { useState } from "react";
 import {
 	Dimensions,
@@ -14,7 +15,6 @@ import styled from "styled-components/native";
 import { Comment } from "../components/Comment";
 import { Spinner } from "../components/UI/Spinner";
 import { useComments } from "../hooks/comments/useComments";
-
 const screenHeight = Dimensions.get("window").height;
 
 const Container = styled(ScrollView)`
@@ -51,6 +51,7 @@ const FooterCreateComment = styled.TextInput.attrs({
 `;
 
 export const PostCommentScreen = () => {
+	const apiUrl = Constants.expoConfig.extra.apiUrl;
 	const navigation = useNavigation();
 	const route = useRoute();
 	const { id } = route.params;
@@ -62,15 +63,11 @@ export const PostCommentScreen = () => {
 
 	const createComment = useMutation({
 		mutationFn: async values => {
-			return await axios.post(
-				`http://192.168.1.101:4000/comments/${id}`,
-				values,
-				{
-					headers: {
-						Authorization: `Bearer ${token}`,
-					},
-				}
-			);
+			return await axios.post(`${apiUrl}/comments/${id}`, values, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			});
 		},
 		onSuccess: async () => {
 			await queryClient.invalidateQueries(["comments"]);
