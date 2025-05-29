@@ -1,3 +1,4 @@
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { useState } from "react";
 import { TouchableOpacity } from "react-native";
 import styled from "styled-components/native";
@@ -43,22 +44,43 @@ const FooterLabel = styled.Text`
 `;
 
 export const Footer = () => {
+	const navigation = useNavigation();
 	const [isOpenMenu, setIsOpenMenu] = useState(false);
+	const route = useRoute();
+	const currentRoute = route.name;
 
 	return (
 		<>
 			<FooterContainer>
 				{isOpenMenu && <FooterMenu />}
-				<FooterBtnWrapper>
-					<FooterBtns
-						source={require("../assets/homeActiveIcon.png")}
-					/>
-					<FooterLabel>Головна</FooterLabel>
-				</FooterBtnWrapper>
-				<FooterBtnWrapper>
-					<FooterBtns source={require("../assets/book.png")} />
-					<FooterLabel>Книга</FooterLabel>
-				</FooterBtnWrapper>
+				<TouchableOpacity onPress={() => navigation.navigate("Home")}>
+					<FooterBtnWrapper>
+						<FooterBtns
+							source={
+								currentRoute === "Home"
+									? require("../assets/homeActiveIcon.png")
+									: require("../assets/home.png")
+							}
+						/>
+						<FooterLabel>Головна</FooterLabel>
+					</FooterBtnWrapper>
+				</TouchableOpacity>
+
+				<TouchableOpacity
+					onPress={() => navigation.navigate("MyRecipes")}
+				>
+					<FooterBtnWrapper>
+						<FooterBtns
+							source={
+								currentRoute === "MyRecipes"
+									? require("../assets/bookActiveIcon.png")
+									: require("../assets/book.png")
+							}
+						/>
+						<FooterLabel>Книга</FooterLabel>
+					</FooterBtnWrapper>
+				</TouchableOpacity>
+
 				<TouchableOpacity onPress={() => setIsOpenMenu(prev => !prev)}>
 					<FooterBtnWrapper>
 						<FooterBtnLarge
@@ -71,10 +93,21 @@ export const Footer = () => {
 					<FooterBtns source={require("../assets/avatar.png")} />
 					<FooterLabel>Підписки</FooterLabel>
 				</FooterBtnWrapper>
-				<FooterBtnWrapper>
-					<FooterBtns source={require("../assets/category.png")} />
-					<FooterLabel>Категорії</FooterLabel>
-				</FooterBtnWrapper>
+
+				<TouchableOpacity
+					onPress={() => navigation.navigate("Categories")}
+				>
+					<FooterBtnWrapper>
+						<FooterBtns
+							source={
+								currentRoute === "Categories"
+									? require("../assets/categoryActiveIcon.png")
+									: require("../assets/category.png")
+							}
+						/>
+						<FooterLabel>Категорії</FooterLabel>
+					</FooterBtnWrapper>
+				</TouchableOpacity>
 			</FooterContainer>
 		</>
 	);

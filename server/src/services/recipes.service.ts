@@ -53,12 +53,54 @@ export const getUserRecipes = async (
 		.find({ where: { userId: objectId } });
 };
 
-export const getRecipes = async (): Promise<Recipes[] | null> => {
-	return await myDataSource.getMongoRepository(Recipes).find({
+export const getFollowRecipes = async (
+	userId: ObjectId
+): Promise<Recipes[] | null> => {
+	const objectId = new ObjectId(userId);
+
+	const userRepo = await myDataSource.getMongoRepository(User);
+	const recipeRepo = await myDataSource.getMongoRepository(Recipes);
+
+	const user = await userRepo.findOne({ where: { _id: objectId } });
+	if (!user) {
+		throw new Error("User not found");
+	}
+
+	if (!user.follows || user.follows.length === 0) {
+		return [];
+	}
+
+	const recipes = await recipeRepo.find({
+		where: {
+			userId: { $in: user.follows },
+		},
 		order: {
 			createdAt: "DESC",
 		},
 	});
+
+	return recipes;
+};
+
+export const getRecipes = async (
+	category?: string
+): Promise<Recipes[] | null> => {
+	if (category) {
+		return await myDataSource.getMongoRepository(Recipes).find({
+			where: {
+				categories: category,
+			},
+			order: {
+				createdAt: "DESC",
+			},
+		});
+	} else {
+		return await myDataSource.getMongoRepository(Recipes).find({
+			order: {
+				createdAt: "DESC",
+			},
+		});
+	}
 };
 
 export const likeRecipe = async (

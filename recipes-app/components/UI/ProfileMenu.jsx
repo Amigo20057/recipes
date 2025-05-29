@@ -1,5 +1,7 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
 import { useEffect, useRef } from "react";
-import { Animated, View } from "react-native";
+import { Animated, TouchableOpacity, View } from "react-native";
 import styled from "styled-components/native";
 
 const MenuContainer = styled(Animated.View)`
@@ -63,16 +65,61 @@ const UserInfoText = styled.Text`
 	color: #fff;
 `;
 
-export const ProfileMenu = ({ name, email, isVisible }) => {
+const UserButton = styled.View`
+	width: 100%;
+	height: 35px;
+	background-color: #373737;
+	border-radius: 10px;
+	justify-content: center;
+	padding-left: 10px;
+	margin-bottom: 10px;
+`;
+
+export const ProfileMenu = ({
+	name,
+	email,
+	isVisible,
+	isSubscribes,
+	authorPostId,
+	follows,
+	followers,
+	token,
+	isMyProfile = false,
+}) => {
 	const animatedHeight = useRef(new Animated.Value(0)).current;
+	const queryClient = useQueryClient();
 
 	useEffect(() => {
 		Animated.timing(animatedHeight, {
-			toValue: isVisible ? 200 : 0,
+			toValue: isVisible ? 250 : 0,
 			duration: 300,
 			useNativeDriver: false,
 		}).start();
 	}, [isVisible]);
+
+	const subscribeMutation = useMutation({
+		mutationFn: async () => {
+			return await axios.post(
+				`http://192.168.1.101:4000/users/subscribe/${authorPostId}`,
+				{},
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				}
+			);
+		},
+		onSuccess: async () => {
+			await queryClient.invalidateQueries(["profile"]);
+		},
+		onError: error => {
+			console.log("Subscription error", error);
+		},
+	});
+
+	const submit = () => {
+		subscribeMutation.mutate();
+	};
 
 	return (
 		<MenuContainer style={{ height: animatedHeight }}>
@@ -89,11 +136,20 @@ export const ProfileMenu = ({ name, email, isVisible }) => {
 			</MenuHeaderContent>
 			<MainContent>
 				<UserInfo>
-					<UserInfoText>Підписники: 14</UserInfoText>
+					<UserInfoText>Підписники: {followers.length}</UserInfoText>
 				</UserInfo>
 				<UserInfo>
-					<UserInfoText>Підписки: 14</UserInfoText>
+					<UserInfoText>Підписки: {follows.length}</UserInfoText>
 				</UserInfo>
+				{!isMyProfile && (
+					<UserInfo style={{ marginTop: 10 }}>
+						<TouchableOpacity onPress={submit}>
+							<UserInfoText>
+								{isSubscribes ? "Відписатися" : "Підписатися"}
+							</UserInfoText>
+						</TouchableOpacity>
+					</UserInfo>
+				)}
 			</MainContent>
 		</MenuContainer>
 	);

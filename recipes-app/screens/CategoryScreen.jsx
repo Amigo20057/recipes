@@ -1,13 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useNavigation } from "@react-navigation/native";
+import { useRoute } from "@react-navigation/native";
 import { useQuery } from "@tanstack/react-query";
-import { useCallback, useEffect, useState } from "react";
-import { Dimensions, RefreshControl, ScrollView, View } from "react-native";
+import { useEffect, useState } from "react";
+import { Dimensions, ScrollView, View } from "react-native";
 import styled from "styled-components/native";
-import { Footer } from "../components/Footer";
-import { Header } from "../components/Header";
 import { Post } from "../components/Post";
-import { ProfileMenu } from "../components/UI/ProfileMenu";
 import { Spinner } from "../components/UI/Spinner";
 import { useRecipes } from "../hooks/recipes/useRecipes";
 import { useProfile } from "../hooks/users/useProfile";
@@ -19,16 +16,17 @@ const Container = styled(ScrollView)`
 	background-color: #373737;
 `;
 
-export const HomeScreen = () => {
+export const CategoryScreen = () => {
 	const [token, setToken] = useState(null);
-	const [isOpenProfileMenu, setIsOpenProfileMenu] = useState(false);
+	const route = useRoute();
+	const { category } = route.params;
+	const { data: profileData, isLoading: profileDataLoading } =
+		useProfile(token);
 	const {
 		data: recipeData,
 		isLoading: recipeDataLoading,
 		refetch,
-	} = useRecipes();
-	const { data: profileData, isLoading: profileDataLoading } =
-		useProfile(token);
+	} = useRecipes(category);
 	const { data: dataPostAuthor, isLoading: postAuthorLoading } = useQuery({
 		queryKey: ["recipe-user-profile"],
 		queryFn: async () => {
@@ -38,14 +36,6 @@ export const HomeScreen = () => {
 		},
 		select: data => data.data,
 	});
-	const [refreshing, setRefreshing] = useState(false);
-	const navigation = useNavigation();
-
-	const onRefresh = useCallback(async () => {
-		setRefreshing(true);
-		await refetch();
-		setRefreshing(false);
-	}, [refetch]);
 
 	useEffect(() => {
 		const checkToken = async () => {
@@ -62,35 +52,9 @@ export const HomeScreen = () => {
 	if (profileDataLoading || recipeDataLoading || !profileData) {
 		return <Spinner />;
 	}
-
 	return (
 		<View>
-			<Container
-				contentContainerStyle={{ paddingBottom: 60 }}
-				refreshControl={
-					<RefreshControl
-						refreshing={refreshing}
-						onRefresh={onRefresh}
-						colors={["#ffffff"]}
-						tintColor='#ffffff'
-					/>
-				}
-			>
-				<Header
-					setIsOpenProfileMenu={setIsOpenProfileMenu}
-					token={token}
-				/>
-				{isOpenProfileMenu && (
-					<ProfileMenu
-						name={profileData?.fullName}
-						email={profileData?.email}
-						isVisible={isOpenProfileMenu}
-						token={token}
-						followers={profileData?.followers}
-						follows={profileData?.follows}
-						isMyProfile={true}
-					/>
-				)}
+			<Container contentContainerStyle={{ paddingBottom: 60 }}>
 				{recipeData?.map(item => (
 					<Post
 						token={token}
@@ -107,7 +71,6 @@ export const HomeScreen = () => {
 					/>
 				))}
 			</Container>
-			<Footer />
 		</View>
 	);
 };

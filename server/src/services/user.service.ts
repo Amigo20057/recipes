@@ -45,3 +45,40 @@ export const findUserByPostId = async (
 
 	return user;
 };
+
+export const toggleSubscribe = async (
+	targetUserId: string,
+	userId: string | ObjectId
+) => {
+	const targetUserIdObject = new ObjectId(targetUserId);
+	const userIdObject = new ObjectId(userId);
+
+	const repo = myDataSource.getMongoRepository(User);
+
+	const userTarget = await repo.findOne({
+		where: { _id: targetUserIdObject },
+	});
+	const user = await repo.findOne({ where: { _id: userIdObject } });
+
+	if (!user || !userTarget) {
+		throw new Error("User or target user not found");
+	}
+
+	const userIdStr = userIdObject.toHexString();
+	const targetIdStr = targetUserIdObject.toHexString();
+
+	const isFollowing = user.follows.includes(targetIdStr);
+
+	if (isFollowing) {
+		user.follows = user.follows.filter(id => id !== targetIdStr);
+		userTarget.followers = userTarget.followers.filter(
+			id => id !== userIdStr
+		);
+	} else {
+		user.follows.push(targetIdStr);
+		userTarget.followers.push(userIdStr);
+	}
+
+	await repo.save(user);
+	await repo.save(userTarget);
+};

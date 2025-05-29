@@ -1,6 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
-import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useState } from "react";
 import { Dimensions, RefreshControl, ScrollView, View } from "react-native";
 import styled from "styled-components/native";
@@ -9,7 +8,7 @@ import { Header } from "../components/Header";
 import { Post } from "../components/Post";
 import { ProfileMenu } from "../components/UI/ProfileMenu";
 import { Spinner } from "../components/UI/Spinner";
-import { useRecipes } from "../hooks/recipes/useRecipes";
+import { useMyRecipes } from "../hooks/recipes/useMyRecipes";
 import { useProfile } from "../hooks/users/useProfile";
 
 const screenHeight = Dimensions.get("window").height;
@@ -19,25 +18,21 @@ const Container = styled(ScrollView)`
 	background-color: #373737;
 `;
 
-export const HomeScreen = () => {
-	const [token, setToken] = useState(null);
+const CustomText = styled.Text`
+	font-size: 16px;
+	color: #fff;
+`;
+
+export const MyRecipesScreen = () => {
 	const [isOpenProfileMenu, setIsOpenProfileMenu] = useState(false);
+	const [token, setToken] = useState(null);
 	const {
 		data: recipeData,
 		isLoading: recipeDataLoading,
 		refetch,
-	} = useRecipes();
+	} = useMyRecipes(token);
 	const { data: profileData, isLoading: profileDataLoading } =
 		useProfile(token);
-	const { data: dataPostAuthor, isLoading: postAuthorLoading } = useQuery({
-		queryKey: ["recipe-user-profile"],
-		queryFn: async () => {
-			return await axios.get(
-				`http://192.168.1.101:4000/users/profile/${id}`
-			);
-		},
-		select: data => data.data,
-	});
 	const [refreshing, setRefreshing] = useState(false);
 	const navigation = useNavigation();
 
@@ -59,7 +54,7 @@ export const HomeScreen = () => {
 		checkToken();
 	}, []);
 
-	if (profileDataLoading || recipeDataLoading || !profileData) {
+	if (profileDataLoading && profileData) {
 		return <Spinner />;
 	}
 
@@ -91,21 +86,31 @@ export const HomeScreen = () => {
 						isMyProfile={true}
 					/>
 				)}
-				{recipeData?.map(item => (
-					<Post
-						token={token}
-						key={item.id}
-						id={item.id}
-						title={item.title}
-						countLikes={item.countLikes}
-						countComments={item.countComments}
-						createdAt={item.createdAt}
-						imageUrl={`http://192.168.1.101:4000/${item.picture}`}
-						isLike={profileData?.likedPosts.includes(item.id)}
-						follows={profileData?.follows}
-						profileId={profileData?.id}
-					/>
-				))}
+				{recipeData?.length === 0 ? (
+					<CustomText style={{ marginLeft: 15 }}>
+						Ви ще не створили пост
+					</CustomText>
+				) : (
+					recipeData?.map(item => (
+						<Post
+							token={token}
+							key={item.id}
+							id={item.id}
+							title={item.title}
+							countLikes={item.countLikes}
+							countComments={item.countComments}
+							createdAt={item.createdAt}
+							imageUrl={`http://192.168.1.101:4000/${item.picture}`}
+							isLike={
+								profileData?.likedPosts.includes(item.id)
+									? true
+									: false
+							}
+							follows={profileData?.follows}
+							profileId={profileData?.id}
+						/>
+					))
+				)}
 			</Container>
 			<Footer />
 		</View>

@@ -1,6 +1,7 @@
 import { Request, Response, Router } from "express";
 import {
 	createRecipe,
+	getFollowRecipes,
 	getRecipe,
 	getRecipes,
 	getUserRecipes,
@@ -35,7 +36,11 @@ router.post(
 
 router.get("/", async (req: Request, res: Response) => {
 	try {
-		const recipes = await getRecipes();
+		const rawCategory = req.query.category;
+		const category =
+			typeof rawCategory === "string" ? rawCategory.trim() : undefined;
+
+		const recipes = await getRecipes(category);
 		res.status(200).json(recipes);
 	} catch (error) {
 		logger.error(error);
@@ -54,13 +59,12 @@ router.get(`/:id`, async (req: Request, res: Response) => {
 	}
 });
 
-router.get("/my-recipes", AuthCheck, async (req: Request, res: Response) => {
+router.get("/my/recipes", AuthCheck, async (req: Request, res: Response) => {
 	try {
 		const recipes = await getUserRecipes(req.userId!);
 		res.status(200).json(recipes);
 	} catch (error) {
-		logger.error(error);
-		res.status(500).json({ message: "Error get recipe" });
+		res.status(500).json({ message: "Error get recipes", error: error });
 	}
 });
 
@@ -75,5 +79,21 @@ router.post("/like/:id", AuthCheck, async (req: Request, res: Response) => {
 		res.status(500).json({ message: "Error like recipe" });
 	}
 });
+
+router.get(
+	"/follow/recipes",
+	AuthCheck,
+	async (req: Request, res: Response) => {
+		try {
+			const recipes = await getFollowRecipes(req.userId!);
+			res.status(200).json(recipes);
+		} catch (error) {
+			res.status(500).json({
+				message: "Error get recipes",
+				error: error,
+			});
+		}
+	}
+);
 
 export const RecipesRouter = router;

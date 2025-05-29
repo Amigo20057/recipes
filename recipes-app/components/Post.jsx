@@ -108,18 +108,27 @@ export const Post = ({
 	createdAt,
 	isLike,
 	token,
+	follows,
+	profileId,
 }) => {
-	const { data: dataPostAuthor, isLoading: postAuthorLoading } = useQuery({
-		queryKey: ["recipe-user-profile"],
+	const {
+		data: authorData,
+		isLoading: authorLoading,
+		error,
+	} = useQuery({
+		queryKey: ["recipe-user-profile", id],
 		queryFn: async () => {
-			return await axios.get(
+			const res = await axios.get(
 				`http://192.168.1.101:4000/users/profile/${id}`
 			);
+			return res.data;
 		},
-		select: data => data.data,
+		enabled: !!id,
 	});
+
 	const [isLikeRecipe, setIsLikeRecipe] = useState(isLike);
 	const [isOpenProfileMenu, setIsOpenProfileMenu] = useState(false);
+	const [isFollow, setIsFollow] = useState(false);
 	const queryClient = useQueryClient();
 	const navigation = useNavigation();
 
@@ -161,7 +170,7 @@ export const Post = ({
 		},
 	});
 
-	if (postAuthorLoading) {
+	if (authorLoading || !authorData) {
 		return <Spinner />;
 	}
 
@@ -169,9 +178,17 @@ export const Post = ({
 		<PostView>
 			{isOpenProfileMenu && (
 				<ProfileMenu
-					name={dataPostAuthor.fullName}
-					email={dataPostAuthor.email}
+					token={token}
+					authorPostId={authorData.id}
+					name={authorData.fullName}
+					email={authorData.email}
 					isVisible={isOpenProfileMenu}
+					isSubscribes={
+						follows.includes(authorData.id) ? true : false
+					}
+					isMyProfile={profileId === authorData.id ? true : false}
+					followers={authorData.followers}
+					follows={authorData.follows}
 				/>
 			)}
 
