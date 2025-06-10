@@ -202,3 +202,5 @@
 {"level":"error","message":"jwt malformed","name":"JsonWebTokenError","timestamp":"2025-05-29T19:33:50.907Z"}
 {"level":"error","message":"jwt malformed","name":"JsonWebTokenError","timestamp":"2025-05-29T19:37:55.871Z"}
 {"level":"error","message":"No metadata for \"Recipes\" was found.","timestamp":"2025-05-29T19:38:12.669Z"}
+{"level":"error","message":"jwt malformed","name":"JsonWebTokenError","timestamp":"2025-06-02T09:22:05.014Z"}
+{"level":"error","message":"jwt malformed","name":"JsonWebTokenError","timestamp":"2025-06-02T09:23:53.062Z"}
